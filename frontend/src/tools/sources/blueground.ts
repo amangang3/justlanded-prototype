@@ -64,7 +64,7 @@ export async function fetchBluegroundListings(
     max_price_monthly_usd: Math.round(prefs.budget_max_usd * 1.5),
     min_bedrooms: null,
     max_results: 25,
-    max_min_stay_days: 60,
+    max_min_stay_days: 90,
     exhaustive: prefs.city === "San Francisco",
     sources: ["blueground"],
   };

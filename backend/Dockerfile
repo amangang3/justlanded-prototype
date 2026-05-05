@@ -1,7 +1,7 @@
 # Microsoft's official Playwright Python image ships Python 3.12, the
 # Playwright Python package, and Chromium (with all required system libs).
 # Saves us from pinning ~30 apt packages by hand.
-FROM mcr.microsoft.com/playwright/python:v1.48.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.59.0-jammy
 
 WORKDIR /app
 

@@ -19,6 +19,7 @@ interface ScraperRow {
   max_stay_days: number | null;
   available_from: string | null;
   available_to: string | null;
+  image_url: string | null;
 }
 
 interface ScrapeResponse {
@@ -115,6 +116,7 @@ export async function fetchBluegroundListings(
           (r.sqft ? `, ${r.sqft} sqft` : "") +
           (r.min_stay_days ? `, ${r.min_stay_days}-day min stay` : ""),
         posted_at: new Date().toISOString(),
+        image_url: r.image_url ?? undefined,
       };
     });
   } catch (err) {

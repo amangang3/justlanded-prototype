@@ -23,6 +23,7 @@ def normalize(raw: RawListing, params: SearchParams | None = None) -> dict:
         "max_stay_days": raw.max_stay_days,
         "available_from": raw.available_from,
         "available_to": raw.available_to,
+        "image_url": raw.photos[0] if raw.photos else None,
     }
 
 

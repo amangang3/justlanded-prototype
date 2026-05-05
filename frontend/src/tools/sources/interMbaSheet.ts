@@ -1,5 +1,6 @@
 import type { UserPreferences, Listing } from "../../types";
 import { useAppStore } from "../../state";
+import { geocodeListings } from "../geocode";
 
 const SHEET_ID = "1FTmM_7uccmK_MVCzomoyaIgR_BnPXp_dIFNpiPSWwNU";
 
@@ -305,21 +306,29 @@ export async function fetchInterMbaListings(
     );
   }
 
+  let all: Listing[];
   if (primary.length >= 5 || gids.length === 1) {
-    return primary;
+    all = primary;
+  } else {
+    // Fetch additional tabs in parallel if primary was thin
+    const additionalResults = await Promise.allSettled(
+      gids.slice(1).map((gid) => fetchAndParseSingleTab(gid, prefs.city)),
+    );
+    const additional = additionalResults.flatMap((r) =>
+      r.status === "fulfilled" ? r.value : [],
+    );
+    all = [...primary, ...additional];
+    console.log(
+      `InterMBA[${prefs.city}]: ${all.length} total listings across ${gids.length} tabs`,
+    );
   }
 
-  // Fetch additional tabs in parallel if primary was thin
-  const additionalResults = await Promise.allSettled(
-    gids.slice(1).map((gid) => fetchAndParseSingleTab(gid, prefs.city)),
-  );
-  const additional = additionalResults.flatMap((r) =>
-    r.status === "fulfilled" ? r.value : [],
-  );
-
-  const all = [...primary, ...additional];
+  // Populate lat/lng via Nominatim. First search is slow (rate-limited to
+  // ~1/sec), but results are cached in localStorage so repeats are instant.
+  await geocodeListings(all);
+  const geocoded = all.filter((l) => l.lat !== 0 || l.lng !== 0).length;
   console.log(
-    `InterMBA[${prefs.city}]: ${all.length} total listings across ${gids.length} tabs`,
+    `InterMBA[${prefs.city}]: geocoded ${geocoded}/${all.length} addresses`,
   );
   return all;
 }

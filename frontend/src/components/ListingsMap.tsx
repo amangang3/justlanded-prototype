@@ -3,15 +3,28 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Listing, RankedListing } from "../types";
 
-// Fix default marker icons (Leaflet + bundler issue)
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+// Inline SVG pin avoids the Leaflet default-icon bundler dance entirely.
+const pinSvg = (color: string, scale = 1) => `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${24 * scale}" height="${36 * scale}">
+  <path d="M12 0C5.373 0 0 5.373 0 12c0 9 12 24 12 24s12-15 12-24c0-6.627-5.373-12-12-12z"
+        fill="${color}" stroke="#7a1717" stroke-width="1"/>
+  <circle cx="12" cy="12" r="4.5" fill="white"/>
+</svg>`;
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+const redPinIcon = L.divIcon({
+  className: "listing-pin",
+  html: pinSvg("#dc2626"),
+  iconSize: [24, 36],
+  iconAnchor: [12, 36],
+  popupAnchor: [0, -34],
+});
+
+const selectedPinIcon = L.divIcon({
+  className: "listing-pin listing-pin--selected",
+  html: pinSvg("#b91c1c", 1.2),
+  iconSize: [29, 43],
+  iconAnchor: [14, 43],
+  popupAnchor: [0, -41],
 });
 
 interface ListingsMapProps {
@@ -62,7 +75,7 @@ export default function ListingsMap({
           <Marker
             key={listing.id}
             position={[listing.lat, listing.lng]}
-            opacity={isSelected ? 1 : 0.8}
+            icon={isSelected ? selectedPinIcon : redPinIcon}
             eventHandlers={{
               click: () => onMarkerClick(listing.id),
             }}

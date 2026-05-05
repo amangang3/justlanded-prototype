@@ -1,3 +1,13 @@
+---
+title: Just Landed Scraper
+emoji: 🏠
+colorFrom: red
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # housing-scraper
 
 Aggregator for short-term furnished housing — pulls listings from **Blueground** and writes them straight to an Excel file. Built for MBA summer-internship housing search.

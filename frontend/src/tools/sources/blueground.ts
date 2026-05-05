@@ -40,6 +40,16 @@ export async function fetchBluegroundListings(
     return [];
   }
 
+  // On a hosted HTTPS site, calls to http://localhost would be blocked as
+  // mixed content. Skip silently rather than spamming the console.
+  if (
+    typeof window !== "undefined" &&
+    window.location.protocol === "https:" &&
+    scraperUrl.startsWith("http://")
+  ) {
+    return [];
+  }
+
   const state = STATE_BY_CITY[prefs.city];
   if (!state) {
     console.warn(`Blueground: no state mapping for city ${prefs.city}`);
@@ -59,10 +69,18 @@ export async function fetchBluegroundListings(
     sources: ["blueground"],
   };
 
+  // Shared-secret token, baked in at Vite build time. Empty in local dev.
+  const scraperToken = import.meta.env.VITE_SCRAPER_TOKEN ?? "";
+
   try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (scraperToken) headers["X-Demo-Token"] = scraperToken;
+
     const res = await fetch(`${scraperUrl.replace(/\/$/, "")}/scrape`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(body),
     });
 

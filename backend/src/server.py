@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import logging
+import os
 from datetime import date
 
 import structlog
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -12,6 +13,18 @@ from src.config import settings
 from src.pipeline import run_search
 from src.scrapers import SCRAPERS
 from src.scrapers.base import SearchParams
+
+# Shared-secret guard for the public /scrape endpoint. When unset (e.g. local
+# dev), the endpoint is open. When set (hosted demo on HF Spaces), callers
+# must send a matching X-Demo-Token header.
+DEMO_TOKEN = os.environ.get("DEMO_TOKEN", "").strip()
+
+
+def require_token(x_demo_token: str | None = Header(default=None)) -> None:
+    if not DEMO_TOKEN:
+        return
+    if not x_demo_token or x_demo_token != DEMO_TOKEN:
+        raise HTTPException(status_code=401, detail="invalid or missing X-Demo-Token")
 
 
 def _setup_logging() -> None:
@@ -56,7 +69,7 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.post("/scrape")
+@app.post("/scrape", dependencies=[Depends(require_token)])
 async def scrape(req: ScrapeRequest) -> dict:
     src_list = req.sources or ["blueground"]
     for s in src_list:

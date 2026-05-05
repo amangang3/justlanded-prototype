@@ -116,6 +116,13 @@ export default function ListingDetailModal({
         <div className="flex flex-1 overflow-hidden">
           {/* Left: listing details */}
           <div className="flex-1 overflow-y-auto p-6 border-r border-gray-200 space-y-4">
+            {/* Image */}
+            {listing.image_url && (
+              <div className="w-full h-48 rounded-lg overflow-hidden">
+                <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+
             {/* Price + score row */}
             <div className="flex items-center gap-3">
               <span className="text-2xl font-bold text-gray-900">

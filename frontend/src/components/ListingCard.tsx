@@ -42,9 +42,13 @@ export default function ListingCard({
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-      {/* Thumbnail placeholder */}
-      <div className="relative w-full h-40 bg-gray-300 flex items-center justify-center">
-        <span className="text-gray-500 text-sm">No image</span>
+      {/* Thumbnail */}
+      <div className="relative w-full h-40 bg-gray-300 flex items-center justify-center overflow-hidden">
+        {listing.image_url ? (
+          <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-gray-500 text-sm">No image</span>
+        )}
         <span
           className={`absolute top-2 right-2 text-xs font-medium px-2 py-0.5 rounded ${sourceBadgeColor(listing.source)}`}
         >

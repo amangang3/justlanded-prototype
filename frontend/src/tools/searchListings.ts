@@ -7,6 +7,33 @@ import {
 } from "./sources";
 
 // ---------------------------------------------------------------------------
+// Listing images — cycled across results
+// ---------------------------------------------------------------------------
+const LISTING_IMAGES = [
+  "/images/Image1.jpeg",
+  "/images/image2.jpeg",
+  "/images/Image3.jpeg",
+  "/images/Image4.jpeg",
+  "/images/Image6.jpeg",
+  "/images/Image7.jpeg",
+  "/images/Image8.jpeg",
+  "/images/Image9.jpeg",
+  "/images/Image10.jpeg",
+  "/images/Image11.jpeg",
+  "/images/Image12.jpeg",
+  "/images/Image13.jpeg",
+  "/images/Image14.jpeg",
+  "/images/Image 15.jpeg",
+];
+
+function assignImages(listings: Listing[]): Listing[] {
+  return listings.map((l, i) => ({
+    ...l,
+    image_url: l.image_url || LISTING_IMAGES[i % LISTING_IMAGES.length],
+  }));
+}
+
+// ---------------------------------------------------------------------------
 // City alias sets for loose matching
 // ---------------------------------------------------------------------------
 const CITY_ALIASES: Record<string, string[]> = {
@@ -136,7 +163,7 @@ export async function searchListings(
   if (useSyntheticData) {
     const results = filterSynthetic(prefs);
     console.log("searchListings: using synthetic data,", results.length, "listings");
-    return results;
+    return assignImages(results);
   }
 
   // Live sources: InterMBA Google Sheet + Blueground (via local scraper API).
@@ -185,5 +212,5 @@ export async function searchListings(
 
   // Cap at 50 candidates so Claude has meaningful room to pick the top 20
   // while keeping per-call input tokens bounded (~25K tokens at 50 listings).
-  return merged.slice(0, 50);
+  return assignImages(merged.slice(0, 50));
 }

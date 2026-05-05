@@ -29,6 +29,7 @@ export interface Listing {
   amenities: string[];
   description: string;
   posted_at: string;
+  image_url?: string;
 }
 
 export interface CommuteResult {
